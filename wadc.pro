@@ -33,7 +33,8 @@ SOURCES += \
     port.cpp \
     myudp.cpp \
     mytcp.cpp \
-    beamunitlib.cpp
+    beamunitlib.cpp \
+    fwriter.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -42,7 +43,8 @@ HEADERS += \
     wadc_defines.h \
     myudp.h \
     mytcp.h \
-    beamunitlib.h
+    beamunitlib.h \
+    fwriter.h
 
 FORMS += \
         mainwindow.ui
