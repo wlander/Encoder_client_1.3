@@ -6,7 +6,7 @@
 //#define DEBUG_MODE
 
 #define N_RCV_MAX 32768
-#define N_RCV_DEF 1024
+#define N_RCV_DEF 2048
 #define N_FLAG 16
 #define POS_CH1 2121
 #define POS_CH2 2135
@@ -61,7 +61,6 @@ const char Conf_Byte_Enc_View_Off = 42;
 
 const int COM_BaudRate = 230400;
 
-
 typedef volatile struct
 {
     char Mode_Op;
@@ -73,34 +72,30 @@ typedef volatile struct
     bool fl_rcv_data_en;
     bool fl_rcv_control_en;
 
-    unsigned int N_RCV; //+
-    unsigned int cnt_recv; //+
-    unsigned int cnt_obr;	//+
-    unsigned int cnt_byte_rec;
-    unsigned int cnt_cdg_recv;
-    unsigned int cnt_block_recv; //+
-    unsigned int  Num_Ch;	//+
-    unsigned int cnt_reg_recv; //+
+    int N_RCV; //+
+    int cnt_recv; //+
+    int cnt_obr;	//+
+    int cnt_byte_rec;
+    int cnt_cdg_recv;
+    int cnt_block_recv; //+
+    int  Num_Ch;	//+
+    int cnt_reg_recv; //+
 
     double Fd; //+
     double Fd_Inv; //+
 
     double  mx_ch[3]; //+
     double  min_ch[3]; //+
-    double  k_norm[3]; //????
-    double  obr_buf_f[3][N_RCV_MAX]; //+
+    double  k_norm[3]; //+
 
 //-------------
 
-    unsigned char recv_buf[N_RCV_MAX]; //+
-    short obr_buf[N_RCV_MAX]; //+
-
     bool fl_write_to_file; //+
-    unsigned cnt_data_recv; //+
+    int cnt_data_recv; //+
 
-    unsigned Refresh_Cycle_View;
-    unsigned cnt_cycle_view;
-    unsigned num_block_view = N_RCV_DEF;    
+    int Refresh_Cycle_View;
+    int cnt_cycle_view;
+    int num_block_view = N_RCV_DEF;
 
 }data_managing;
 
@@ -110,27 +105,27 @@ typedef volatile struct
     bool Tahometr_On;
     bool Fl_Porog;
     double PorogTah;
-    unsigned NumChTah;
-    unsigned NumChVol;
-    unsigned CntObTah;
-    unsigned ObMinTah_Aver;
-    unsigned TimeObTah;
+    int NumChTah;
+    int NumChVol;
+    int CntObTah;
+    int ObMinTah_Aver;
+    double TimeObTah;
     double Sum_Tah;
-    unsigned CntAverTah;
+    double CntAverTah;
     double TimeAverTah;
-    unsigned SumTimeAverTah;
+    int SumTimeAverTah;
     double win_mean_p[NUM_MEAN_P];
-    unsigned short cnt_mean;
+    int cnt_mean;
     double TimeAverVol;
     double Sum_Vol;
     double Aver_Vol;
-    unsigned CntAverVol;
-    unsigned Detect_Tah;
+    int CntAverVol;
+    int Detect_Tah;
     double Pgd_sredn;
     double Pval_sredn;
-    unsigned cnt_p_sredn;
+    int cnt_p_sredn;
 
-    unsigned NumCh_Aver;
+    int NumCh_Aver;
 
     bool Fl_0_Before;
     double cnt_time_0_before;
@@ -155,6 +150,8 @@ typedef volatile struct
 
     bool  Fl_Tou;
     bool  Fl_mean_set;
+
+    bool Fl_simulator;
 
 }torsi_control;
 
@@ -181,7 +178,6 @@ typedef struct
     char filter_ch2;
 
 }encoder_params;
-
 
 #define START_ID_DATA_ENC  0x3FFFFFFF
 #define SPEED_MARK_ENC  0xFFFFFFFF
