@@ -29,7 +29,7 @@ class Status : public QObject
 
 public:
 
-    enum status_num{
+    enum  status_num{
         Recieved,
         Writed_cash,
         Processed,
@@ -62,6 +62,7 @@ public:
         return 0;
     }
 
+    bool PortOpened;
 };
 
 class Port : public QObject
@@ -82,9 +83,10 @@ signals:
 
     void sigFinishedPort(); //
     void sigError_(QString err);
-    void sigSendPortData(QByteArray);
+    void sigSendPortData();
     void sigSendRecordData(QByteArray);
     void sigStatus(QString);
+    void sigPortOpened();
 
 public slots:
 
@@ -98,7 +100,7 @@ public slots:
     void slotSetRecordEn(bool);
     void slotGetRecordData();
     void slotSetBufSize(int size);
-    void slotClearPort();
+    bool slotClearPort();
     void slotTimerEv();
     void slotSimulatorStart(int, int);
     void slotSimulatorStop();
@@ -115,7 +117,6 @@ public:
 private:
 
     QByteArray* data_buf;
-
     char* out_recv_data;
     int size_recv_data;
     volatile bool ready_rd;
@@ -124,7 +125,7 @@ private:
     volatile bool ready_fwriter;
 
     QByteArray* buf_simulator;
-    float data_simulator[8000];
+    float* data_simulator;
     QTimer* timer_simulator;
     QTime time_timer;
     QDate d_time;

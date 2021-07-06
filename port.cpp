@@ -25,7 +25,7 @@ Port::Port(QObject *parent) :
     nrcv_t = nrcv/sizeof(DATA_TYPE);
 
     buf_simulator = new QByteArray;
-//    data_simulator = new float[nrcv];
+    data_simulator = new float[nrcv];
     timer_simulator = new QTimer;
     q_buffer = new QQueue<QByteArray>;
     data_buf = new QByteArray;
@@ -40,6 +40,8 @@ Port::Port(QObject *parent) :
     record_en = false;
     ready_rd = false;
     ready_fwriter = false;
+
+    status.PortOpened = false;
 
     slotInitSimulator(1000, 512);
     timer_simulator->start(100);
@@ -79,23 +81,31 @@ void Port :: slotWriteSettingsPort(QString name, int baudrate,int DataBits,
 int Port :: slotConnectPort(void){//
     CPort.setPortName(SettingsPort.name);
     if (CPort.open(QIODevice::ReadWrite)) {
+
         if (CPort.setBaudRate(SettingsPort.baudRate)
-                && CPort.setDataBits(SettingsPort.dataBits)//DataBits
-                && CPort.setParity(SettingsPort.parity)
-                && CPort.setStopBits(SettingsPort.stopBits)
-                && CPort.setFlowControl(SettingsPort.flowControl))
+             && CPort.setDataBits(SettingsPort.dataBits)
+             && CPort.setParity(SettingsPort.parity)
+             && CPort.setStopBits(SettingsPort.stopBits)
+             && CPort.setFlowControl(SettingsPort.flowControl))
         {
+
             if (CPort.isOpen()){
-                sigError_((SettingsPort.name+ " >> Открыт!\r").toLocal8Bit());
+                 status.PortOpened = true;
+                 CPort.setReadBufferSize(nrcv*16); //!!! *2
+                 CPort.clear();
+                 sigPortOpened();
             }
+
         } else {
             CPort.close();
             sigError_(CPort.errorString().toLocal8Bit());
-          }
-        CPort.setReadBufferSize(nrcv*16); //!!! *2
+            status.PortOpened = false;
+        }
+
     } else {
         CPort.close();
         sigError_(CPort.errorString().toLocal8Bit());
+        status.PortOpened = false;
     }
 
     if(CPort.isOpen()) return 1;
@@ -122,12 +132,14 @@ void Port :: slotWriteToPort(QByteArray data){
     if(CPort.isOpen()){
         CPort.write(data);
     }
+    else{
+       sigError_(CPort.errorString().toLocal8Bit());
+    }
 }
 
 
 void Port :: slotReadInPort(){
-   float dd;
-   char* ptr_dd = (char*)(&dd);
+
    int port_data = CPort.bytesAvailable();
 
    if(port_data>=nrcv){
@@ -143,10 +155,10 @@ void Port :: slotReadInPort(){
            status.status_num[status.Writed_cash]+=nrcv_t;
            //qDebug()<<"Num data in queue:"<<q_buffer.size();
        }
-       if(ready_rd){
+       if((ready_rd)&&(out_recv_data!=0)){
            memcpy(out_recv_data, data_buf->data(), size_recv_data);
            status.status_num[status.Processed]+=nrcv_t;
-           sigSendPortData(*data_buf);
+           sigSendPortData();
            ready_rd = false;
        }
    }
@@ -193,11 +205,16 @@ void Port::slotTimerEv(){
    }
 }
 
-void Port :: slotClearPort(){
+bool Port :: slotClearPort(){
    q_buffer->clear();
-   CPort.clear();
+
+   if(CPort.clear()) status.PortOpened = true;
+   else status.PortOpened = false;
+
    memset(status.status_num, 0, status.Max_num_Status*sizeof(int));
    time_timer.restart();
+
+   return status.PortOpened;
 }
 
 void Port::slotGetStatus(){

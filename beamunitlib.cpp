@@ -7,7 +7,7 @@
 
 BeamUnitLib::BeamUnitLib(QObject *parent) : QObject(parent)
 {
-    cntrl_sd_ptr = new cdg_control_sd;
+
     data_mng = new data_managing;
     torsi_cntrl = new torsi_control;
     //data_buf = new float[N_RCV_MAX];
@@ -36,19 +36,9 @@ void BeamUnitLib::init_all(){
     data_mng->Num_Ch = 3;
     data_mng->cnt_reg_recv = 0;
 
-    data_mng->Fd = 7000.0;
-    data_mng->Fd_Inv = 1.0/data_mng->Fd;
-
-    data_mng->k_norm[0] = 1.0;
-    data_mng->k_norm[1] = 1.0;
-    data_mng->k_norm[2] = 1.0;
-
-    num_data_recv = ((SIZE_DATA_CDG*2)+16);
-
     data_mng->Refresh_Cycle_View = 2;
     data_mng->cnt_cycle_view = 0;
     data_mng->num_block_view = N_RCV_DEF;
-
 
     torsi_cntrl->Tahometr_On = true;
     torsi_cntrl->Fl_Porog = true;
@@ -68,28 +58,7 @@ void BeamUnitLib::init_all(){
     torsi_cntrl->Aver_Vol = 1;
     torsi_cntrl->CntAverVol = 0;
     torsi_cntrl->Detect_Tah = 0;
-    torsi_cntrl->Pgd_sredn = 0;
-    torsi_cntrl->Pval_sredn = 0;
-    torsi_cntrl->cnt_p_sredn = 0;
     torsi_cntrl->NumCh_Aver = 0;
-    torsi_cntrl->Fl_0_Before = false;
-    torsi_cntrl->cnt_time_0_before = 0.0;
-    torsi_cntrl->Sum0Before = 0.0;
-    torsi_cntrl->Time0Before = 10.0;
-
-    torsi_cntrl->Fl_0_After = false;
-    torsi_cntrl->cnt_time_0_after = 0.0;
-    torsi_cntrl->Sum0After = 0.0;
-    torsi_cntrl->Time0After = 10.0;
-
-    torsi_cntrl->M_val = 0;
-    torsi_cntrl->Pval = 0;
-    torsi_cntrl->Pgd = 0;
-
-    torsi_cntrl->Kusil = 1.0;
-    torsi_cntrl->Msopr = 1.0;
-    torsi_cntrl->KPD_Red = 0.5;
-    torsi_cntrl->Per_Otnosh = 1.0;
 
     x.resize(N_RCV_MAX*2);
     y.resize(N_RCV_MAX*2);
@@ -104,31 +73,20 @@ void BeamUnitLib::init_all(){
 BeamUnitLib::~BeamUnitLib()
 {
     qDebug("By BeamUnitLib!");
-    delete [] cntrl_sd_ptr;
     delete [] data_mng;
     delete [] torsi_cntrl;
     //delete data_buf;
 }
 
-int BeamUnitLib::Handler_unit()
+void BeamUnitLib::Handler_unit()
 {
-   unsigned int i,j;
+   unsigned int i;
    QString str;
    unsigned start_pos_data=0;
    unsigned kk = 0;
    double summ_t = 0;
    double meann = 0;
    double diff = 0;
-   double Tau = 0;
-   double Kus = 0;
-
-    if(torsi_cntrl->Fl_Tou){
-        Tau = torsi_cntrl->Sum0Before;
-        Kus = torsi_cntrl->Kusil;
-    }else{
-        Tau = 0;
-        Kus = 1.0;
-    }
 
     data_mng->cnt_block_recv = 0;
     start_pos_data=0;
@@ -208,10 +166,15 @@ int BeamUnitLib::Handler_unit()
                 torsi_cntrl->CntObTah = 0;
             }
 
-
         }//end Tah
 
-    return 0;
+    if((data_mng->cnt_cycle_view>=data_mng->Refresh_Cycle_View) && (data_mng->Fl_Proc)){
+        data_mng->cnt_cycle_view = 0;
+        emit sig_proc_comlplete();
+    }
+
+    emit SigReadyRecv(ptr_data_recv, get_n_rcv()*4);
+
 }
 
 void BeamUnitLib::set_data_show(int num_ch){
@@ -234,16 +197,8 @@ void BeamUnitLib::set_data_show(int num_ch){
     else{
         qDebug()<<"Out of Range Num_Ch"<<endl;
     }
+
 }
-
-int BeamUnitLib::set_header(char* data){
-    char* struct_ptr = (char*)this->cntrl_sd_ptr;
-
-    for(int i=0;i<sizeof(cdg_control_sd);i++) struct_ptr[i] = data[i];
-
-    return 0;
-}
-
 
 //setters
 
@@ -253,27 +208,6 @@ void BeamUnitLib::set_reinit(){
     data_mng->cnt_data_recv = 0;
     data_mng->Fl_Start = true;
     torsi_cntrl->CntObTah = 0;
-    torsi_cntrl->Pgd_sredn = 0;
-    torsi_cntrl->Pval_sredn = 0;
-    torsi_cntrl->cnt_p_sredn = 0;
+    emit SigReadyRecv(ptr_data_recv, get_n_rcv()*4);
 }
 
-void BeamUnitLib::set_buf_size(int n){
-    data_mng->N_RCV = n;
-}
-
-void BeamUnitLib::set_data_connect(bool fl_connect){
-    data_mng->Fl_Connect = fl_connect;
-}
-
-void BeamUnitLib::set_data_start(bool fl_start){
-    data_mng->Fl_Start = fl_start;
-}
-
-void BeamUnitLib::set_cycle_view(int cycle_view){
-    data_mng->Refresh_Cycle_View = cycle_view;
-}
-
-void BeamUnitLib::set_thr_err(double p){
-    torsi_cntrl->PorogTah = p;
-}
