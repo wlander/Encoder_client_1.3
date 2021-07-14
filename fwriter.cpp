@@ -27,7 +27,6 @@ void fwriter::proc(const QByteArray in_data)
              qDebug("error file open!");
          }
 
-
     }
     else{
         qDebug("file path is empty!");

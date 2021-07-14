@@ -58,7 +58,7 @@ typedef volatile struct
     bool Fl_Porog;
     double PorogTah;
     int NumChTah;
-    int NumChVol;
+    double Fmean;
     int CntObTah;
     int ObMinTah_Aver;
     double TimeObTah;
@@ -67,10 +67,6 @@ typedef volatile struct
     double TimeAverTah;
     int SumTimeAverTah;
     int cnt_mean;
-    double TimeAverVol;
-    double Sum_Vol;
-    double Aver_Vol;
-    int CntAverVol;
     int Detect_Tah;
     int NumCh_Aver;
     bool Fl_simulator;

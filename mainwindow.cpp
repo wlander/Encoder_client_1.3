@@ -18,6 +18,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);  
 
+    ui->label_tah->setStyleSheet("QLabel { background-color : white; }");
+    ui->Plot1->setStyleSheet("QLabel { background-color : white; }");
+    ui->Plot2->setStyleSheet("QLabel { background-color : white; }");
+ //   this->setStyleSheet("QLabel { background-color : gray; }");
+
     ui->lineEdit_3->setText("2");
     ui->lineEdit_4->setText("-2");
     ui->lineEdit_8->setText("2");
@@ -31,7 +36,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->label_19->setText("Отключено");
     ui->label_19->setStyleSheet("font-weight: bold; font-size: 10pt; color: black;");
     ui->Button_Start_Stop->setStyleSheet("QPushButton { background-color : lightgray; }");
-    ui->label_tah->setStyleSheet("QLabel { background-color : yellow; }");
 
     ui->checkBox_proc->setChecked(true);
     ui->checkBox_wr->setChecked(true);
@@ -42,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButton_7->setVisible(false);
     ui->label_13->setVisible(false);
     ui->label_9->setVisible(false);
+    ui->groupBox_3->setVisible(false);
 
 //-------------------- Custom manage and processing class -----------------------------------------------------
     beamunitlib = new BeamUnitLib();
@@ -196,7 +201,7 @@ void MainWindow::on_Button_Start_Stop_clicked()
 
     if(beamunitlib->get_fl_start()==false){
 
-        if(ui->checkBox_wr->isChecked()){
+        if((ui->checkBox_wr->isChecked())&&(!ui->radioBtn_flash_wr->isChecked())){
             str = QFileDialog::getSaveFileName(0, "Файл для записи", "tors_"+cdate.toString("dd-MM-yy")+"__"+ctime.toString("hh-mm")+".dat");
             if(str!=""){
                fwrtr->set_file(str);
@@ -276,7 +281,8 @@ void MainWindow::ProcStat()
     if(beamunitlib->get_tah_ob()==0) ui->label_tah->setText("--------");
     else   ui->label_tah->setText(QString::number(beamunitlib->get_ob_aver()));
 
-    str = "Тахометр, об: " + QString::number(beamunitlib->get_tah_ob());
+    str = "Тах, об: " + QString::number(beamunitlib->get_tah_ob());
+    str += (" / Сред F, КГц: " + QString::number(1000.0/beamunitlib->get_freq(),'f', 3));
     ui->groupBox_7->setTitle(str);
 
     //view_ch_1,2

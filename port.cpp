@@ -44,7 +44,7 @@ Port::Port(QObject *parent) :
     status.PortOpened = false;
 
     slotInitSimulator(1000, 512);
-    timer_simulator->start(100);
+//    timer_simulator->start(100);
 }
 
 Port::~Port()
@@ -124,7 +124,7 @@ void Port::slotHandleError(QSerialPort::SerialPortError error)//
 void  Port::slotDisconnectPort(){
     if(CPort.isOpen()){
         CPort.close();
-        sigError_(SettingsPort.name.toLocal8Bit() + " >> Закрыт!\r");
+        //sigError_(SettingsPort.name.toLocal8Bit() + " >> Закрыт!\r");
     }
 }
 //ot tuta kovuratji!!!

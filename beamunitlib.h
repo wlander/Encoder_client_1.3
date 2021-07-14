@@ -32,14 +32,7 @@ private:
         max_cdg
     };
 
-    const QString set[max_cdg] = {"$SET,1,1,3,3", "$SET,1,3,3,3", "$SET,1,4,3,3", "$SET,2,1,3,3"};
-
-/*
-  const QString usb_start = "$SET,1,1,3,3";
-  const QString flash_start = "$SET,1,3,3,3";
-  const QString flash_read = "$SET,1,4,3,3";
-  const QString stop = "$SET,2,1,3,3";
-*/
+    const QString set[max_cdg] = {"$SET,1,1,3,3;\r\n", "$SET,1,3,3,3;\r\n", "$SET,1,4,3,3;\r\n", "$SET,2,1,3,3;\r\n"};
 
     int cur_set;
 
@@ -61,6 +54,7 @@ public:
     int get_tah_ob(){return torsi_cntrl->CntObTah;}
     int get_ob_aver(){return torsi_cntrl->ObMinTah_Aver;}
     double get_thr_err(){return torsi_cntrl->PorogTah;}
+    double get_freq(){return torsi_cntrl->Fmean;}
     int get_cnt_recv(){return data_mng->cnt_recv;}
     double get_max_ch(int ch){
         if(ch<NUM_CH) return data_mng->mx_ch[ch];

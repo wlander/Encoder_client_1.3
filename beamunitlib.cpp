@@ -44,7 +44,7 @@ void BeamUnitLib::init_all(){
     torsi_cntrl->Fl_Porog = true;
     torsi_cntrl->PorogTah = 0.4;
     torsi_cntrl->NumChTah = 1;
-    torsi_cntrl->NumChVol = 0;
+    torsi_cntrl->Fmean = 0;
     torsi_cntrl->CntObTah = 0;
     torsi_cntrl->ObMinTah_Aver = 0;
     torsi_cntrl->TimeObTah = 0;
@@ -53,10 +53,6 @@ void BeamUnitLib::init_all(){
     torsi_cntrl->TimeAverTah = 1;
     torsi_cntrl->SumTimeAverTah = 0;
     torsi_cntrl->cnt_mean = 0;
-    torsi_cntrl->TimeAverVol = 1;
-    torsi_cntrl->Sum_Vol = 0;
-    torsi_cntrl->Aver_Vol = 1;
-    torsi_cntrl->CntAverVol = 0;
     torsi_cntrl->Detect_Tah = 0;
     torsi_cntrl->NumCh_Aver = 0;
 
@@ -130,6 +126,7 @@ void BeamUnitLib::Handler_unit()
             torsi_cntrl->Detect_Tah++;
 
             meann = summ_t/data_mng->cnt_block_recv;
+            torsi_cntrl->Fmean = meann;
 
             kk = 0;
 
